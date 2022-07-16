@@ -1,25 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from 'react'
+import {
+  Button,
+  Grid,
+  Card,
+  Divider,
+  CardContent,
+  Image,
+} from 'semantic-ui-react'
+import Navbar from './components/Nav/Navbar'
+import style from './style/style'
+import { getProductsService } from './api/ApiServices'
+import toast, { Toaster } from 'react-hot-toast'
+import Cards from './components/Card/Card'
+import Grids from './components/Grid/Grids'
 
-function App() {
+const App = () => {
+  const [basketList, setBasketList] = React.useState([{}])
+  const [products, setProducts] = React.useState([{}])
+  useEffect(() => {
+    getProductsService()
+      .then((item) => {
+        setProducts(item)
+      })
+      .catch((err) => {
+        toast.error(err.message)
+      })
+      .finally(() => {
+        console.log('finally')
+      })
+  }, [])
+  const addBasketList = (item) => {
+    setBasketList([...basketList, item])
+    toast.success(`Add item `)
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+      <Toaster position="top-right" />
+      <Navbar basketCount={basketList.length - 1} basket={basketList} />
+      <Divider></Divider>
+      <Grids products={products} func={addBasketList}></Grids>
+    </>
+  )
 }
 
-export default App;
+export default App
